@@ -1,0 +1,1 @@
+/humgen/atgu1/fs03/berylc/MuscDisease/SpliceRegions/results/allgenes/v6/getMultEditedv6.sh
