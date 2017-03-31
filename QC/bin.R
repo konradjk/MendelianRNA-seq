@@ -1,3 +1,18 @@
+tissue_pref_genes<-read.delim("../data/TissuePreferentiallyExprGenes_FB_MSCK_SKN_ADBP.txt",header=T,stringsAsFactors=F)
+
+
+extractGenesOfInterest<-function(rpkm_file,makecolnames=T,gene_list,patient_col=3,type=NA){
+  rpkm_file<-subset(rpkm_file, Description %in% gene_list)
+  rpkm_file$Name<-NULL
+  rownames(rpkm_file)<-rpkm_file$Description
+  rpkm_file$Description<-NULL
+  
+  if(makecolnames==T){colnames(rpkm_file)<-make.names(rep(type,ncol(rpkm_file)),unique=T)}
+  rpkm_file <- data.frame(t(rpkm_file),stringsAsFactors=F)
+  return(rpkm_file)}
+
+
+
 
 getSexBiased_xist_y<- function(rpkmfile,patientcolbegin=3,out,sexBiasedGenes_yChrom){
   XIST<-rpkmfile[rpkmfile$Description=="XIST",patientcolbegin:ncol(rpkmfile)]
@@ -54,20 +69,4 @@ addPhenotype<- function (All,out,gtex_phenotypes){
   assign(x=paste("WithSex",out,sep="_"),value=All,envir=globalenv())
 }
 
-mele_genes<-read.delim("/humgen/atgu1/fs03/berylc/MuscDisease/QC/MuscleCheck/data/MeleExpGenes.txt",header=T,stringsAsFactors=F)
-#Get Mele genes specific for the tissue from each rpkm file 
 
-#mele_useful = mele_genes[mele_genes$Tisssue %in% c("Skin","Muscle","Adipose tissue","Liver","Fibroblasts"),]
-mele_useful = mele_genes[mele_genes$Tisssue %in% c("Skin","Muscle","Adipose tissue","Liver","Fibroblasts","Adipose tissue","Artery","Colon","Lung","Stomach","Heart","Lung","Bladder"),]
-
-subsetMeleGenes <- function(file,type,makecolnames=T){
-  mele = file[file$Description %in% mele_useful$gene_name,]
-  rownames(mele)<-mele$Description
-  if(ncol(mele)==3){mele[,4]<-1}
-  mele<-mele[,3:ncol(mele)]
-  if(ncol(mele)==2){mele$V4<-NULL}
-  if(makecolnames==T){colnames(mele)<-make.names(rep(type,ncol(mele)),unique=T)}
-  mele<-data.frame(t(mele),stringsAsFactors=F)
-  assign(paste(type,"_mele",sep=""),mele,envir = .GlobalEnv)
-  
-}
