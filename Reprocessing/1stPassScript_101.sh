@@ -9,14 +9,14 @@ fqPath=./$sampname
 allpair1=`ls -1 $fqDir$fqPath/*_1.fastq.gz | sort | tr "\n" "," |  sed 's/.$//'`
 allpair2=`ls -1 $fqDir$fqPath/*_2.fastq.gz | sort | tr "\n" "," |  sed 's/.$//'`
 
-#Only need ID from Read group info. Since both are sorted by alphabetically order, reads should align
+#Only using ID from Read group
 samtools view -H $loc  | egrep "^@RG" | cut -f2 | sort | sed ':a;N;$!ba;s/\n/ , /g' | tr "\t" " " > ReadGroups_${sampname}.txt
 
 #Star command
-/humgen/atgu1/fs03/berylc/MuscDisease/bin/scripts/GeneralAlignment.sh \
+./GeneralAlignment.sh \
 $allpair1 \
 $allpair2 \
-/humgen/atgu1/fs03/berylc/MuscDisease/bin/genomes/101/ \
+/path/to/genome/file/ \
 str_PE \
 8 \
 ${sampname}_1stPass \

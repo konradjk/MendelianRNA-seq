@@ -1,17 +1,15 @@
 library(ggplot2)
 library(gplots)
 library(argparse)
-source("/humgen/atgu1/fs03/berylc/MuscDisease/QC/MuscleCheck/scripts/bin.R")
 
 parser <- ArgumentParser(description='Compare patient RPKMs with GTEx tissues to check validity of tissue identity')
 parser$add_argument('-tissues', action='store',help='Tissues in GTEx rpkm file. Defult: muscle,skin_sun,skin_nosun,subc_adipose,fibroblast.' ,default="muscle,skin_sun,skin_nosun,subc_adipose,fibroblast")
-parser$add_argument('-gtex_rpkm',action='store',help='GTEx RPKM file, default in place for muscle check',default='../data/GTEx')
+parser$add_argument('-gtex_rpkm',action='store',help='GTEx RPKM file, default in place for muscle check',default='../data/GTEx_FB_MSCK_SKN_ADBP_MeleGenes.txt')
 parser$add_argument('-patient_rpkm',action='store',help='Patient RPKM file i.e. *.genes.rpkm.gct file from RNASeQC output')
 parser$add_argument('-outfile',action='store',help='File name to create and plot PCAs to (no.pdf in the end)')
 parser$add_argument('-writePCADat',action='store_true',help='Write PCA file, Boolean option',default=FALSE)
 
 args <- parser$parse_args()
-
 
 tissue_list = strsplit(args$tissues,split=",")[[1]]
 
@@ -29,7 +27,7 @@ colnames(all_patient)<-gsub("\\.","-",colnames(all_patient))
 #This is kind of messed up since it's different in bin.R so you have to fix it each time
 subsetMeleGenes(all_patient,"patient",makecolnames=F)
 
-#Added this 01/15/16 :in because mele_useful now contains genes for colon etc. So need to subset down to the same number of columns
+#need to subset down to the same number of columns
 patient_mele<-patient_mele[,colnames(all_gtex)]
 
 
