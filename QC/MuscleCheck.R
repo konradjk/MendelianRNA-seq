@@ -4,9 +4,9 @@ library(argparse)
 source("/humgen/atgu1/fs03/berylc/MuscDisease/QC/MuscleCheck/scripts/bin.R")
 
 parser <- ArgumentParser(description='Compare patient RPKMs with GTEx tissues to check validity of tissue identity')
-parser$add_argument('-tissues', action='store',help='Tissues (Current options: liver,muscle,skin_sun,skin_nosun,subc_adipose,fibroblast. Default is all except liver',default="muscle,skin_sun,skin_nosun,subc_adipose,fibroblast")
-parser$add_argument('-gtex_rpkm',action='store',help='Output from MakeRPKMfile.R, default in place',default='/humgen/atgu1/fs03/berylc/MuscDisease/QC/MuscleCheck/data/GTEx_5Tissues_MeleGenes_muscle,skin,adipose,fibroblasts.txt')
-parser$add_argument('-patient_rpkm',action='store',help='Patient RPKM file e.g. *.genes.rpkm.gct file from RNASeQC output')
+parser$add_argument('-tissues', action='store',help='Tissues in GTEx rpkm file. Defult: muscle,skin_sun,skin_nosun,subc_adipose,fibroblast.' ,default="muscle,skin_sun,skin_nosun,subc_adipose,fibroblast")
+parser$add_argument('-gtex_rpkm',action='store',help='GTEx RPKM file, default in place for muscle check',default='../data/GTEx')
+parser$add_argument('-patient_rpkm',action='store',help='Patient RPKM file i.e. *.genes.rpkm.gct file from RNASeQC output')
 parser$add_argument('-outfile',action='store',help='File name to create and plot PCAs to (no.pdf in the end)')
 parser$add_argument('-writePCADat',action='store_true',help='Write PCA file, Boolean option',default=FALSE)
 
@@ -16,16 +16,10 @@ args <- parser$parse_args()
 tissue_list = strsplit(args$tissues,split=",")[[1]]
 
 nClus = length(tissue_list)
-#Subctutaneous adipose&fibroblasts and sun exposed and non sun exposed skin cluster together, so if they're in the tissue list, count them each as one cluster
+#Subcutaneous adipose&fibroblasts and sun exposed and non sun exposed skin cluster together, so if they're in the tissue list, count them each as one cluster
 if(length(grep("skin",tissue_list))==2 | length(grep(paste("subc_adipose","fibroblast",sep='|'),tissue_list))==2){nClus = length(tissue_list)-1}
-#11/23/2015 actually subcuataneous adipse and fibroblast shouldn't be clustering together, but I am keeping the command because in PCA space they do seem to be clustering
-
 if(length(grep("skin",tissue_list))==2 && length(grep(paste("subc_adipose","fibroblast",sep='|'),tissue_list))==2){nClus = length(tissue_list)-2}
 
-
-
-#gtexRPKMfile = "/humgen/atgu1/fs03/berylc/MuscDisease/QC/MuscleCheck/data/GTEx_6Tissues_MeleGenes.txt"
-#patientRPKMfile="/humgen/atgu1/fs03/taru/mendelian/RNA-SeQC/genes.rpkm.gct"
 
 all_gtex<-read.delim(args$gtex_rpkm,header=T,row.names=1,stringsAsFactors=F)
 all_gtex<-all_gtex[grep(paste(tissue_list,collapse="|"),rownames(all_gtex)),]
@@ -62,12 +56,6 @@ PCADat[-grep(paste(tissue_list,collapse="|"),PCADat[,cols+1]),cols+1]<-"Patient 
 
 names(PCADat)[cols+1]<-"tissue"
 
-#This is just for a pretty graph
-PCADat[PCADat$tissue=="muscle",cols+1]<-"Muscle"
-PCADat[PCADat$tissue=="skin_sun",cols+1]<-"Skin - lower leg"
-PCADat[PCADat$tissue=="skin_nosun",cols+1]<-"Skin-suprapubic"
-PCADat[PCADat$tissue=="subc_adipose",cols+1]<-"Adipose Subcutaneous"
-PCADat[PCADat$tissue=="fibroblast",cols+1]<-"Transformed fibroblasts"
 
 ggplot(PCADat,aes(x=PC1,y=PC2,col=tissue))+geom_point(size=3)+theme_bw()+theme(plot.title=element_text(size=20),axis.text=element_text(size=15),axis.title=element_text(size=14),legend.title=element_blank(),legend.text=element_text(size=10))+ggtitle("PC1 vs PC2")
  
