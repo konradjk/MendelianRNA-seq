@@ -1,5 +1,4 @@
-tissue_pref_genes<-read.delim("../data/TissuePreferentiallyExprGenes_FB_MSCK_SKN_ADBP.txt",header=T,stringsAsFactors=F)
-
+tissue_pref_genes<-read.delim("/humgen/atgu1/fs03/berylc/MuscDisease/Git/MendelianRNA-seq/data/TissuePreferentiallyExprGenes_FB_MSCK_SKN_ADBP.txt",header=T,stringsAsFactors=F)$gene
 
 extractGenesOfInterest<-function(rpkm_file,makecolnames=T,gene_list,patient_col=3,type=NA){
   rpkm_file<-subset(rpkm_file, Description %in% gene_list)
@@ -10,7 +9,6 @@ extractGenesOfInterest<-function(rpkm_file,makecolnames=T,gene_list,patient_col=
   if(makecolnames==T){colnames(rpkm_file)<-make.names(rep(type,ncol(rpkm_file)),unique=T)}
   rpkm_file <- data.frame(t(rpkm_file),stringsAsFactors=F)
   return(rpkm_file)}
-
 
 
 
